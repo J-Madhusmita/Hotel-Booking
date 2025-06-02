@@ -28,16 +28,19 @@ const clerkWebhooks = async(req, res) => {
             image: data.image_url,
         };
 
+        console.log("user-data" , userData);
+
         switch (type) {
-            case "User.created":{
-                await User.create(userData);
+            case "user.created":{                
+                const user = await User.create(userData);
+                console.log("user created", user);
                 break;
             }
-            case "User.updated":{
+            case "user.updated":{
                 await User.findByIdAndUpdate(data.id, userData);
                 break;
             }
-            case "User.deleted":{
+            case "user.deleted":{
                 await User.findByIdAndDelete(data.id);
                 break;
             }
