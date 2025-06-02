@@ -3,6 +3,7 @@ import { Webhook } from "svix";
 
 const clerkWebhooks = async(req, res) => {
     try{
+        console.log("-----------------------------");
         //Create a svix instance with clerk webhook secret.
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
 
@@ -18,6 +19,7 @@ const clerkWebhooks = async(req, res) => {
 
         // Getting Data from request body
         const { data, type } = req.body;
+        console.log(type)
 
         const userData = {
             _id: data.id,
