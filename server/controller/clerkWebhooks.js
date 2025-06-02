@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import { Webhook } from "svix";
 
 const clerkWebhooks = async(req, res) => {
-    try{        
+    try{
         //Create a svix instance with clerk webhook secret.
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
 
@@ -18,6 +18,7 @@ const clerkWebhooks = async(req, res) => {
 
         // Getting Data from request body
         const { data, type } = req.body;
+        console.log(type)
 
         const userData = {
             _id: data.id,
@@ -26,16 +27,19 @@ const clerkWebhooks = async(req, res) => {
             image: data.image_url,
         };
 
+        console.log("user-data" , userData);
+
         switch (type) {
-            case "User.created":{
-                await User.create(userData);
+            case "user.created":{                
+                const user = await User.create(userData);
+                console.log("user created", user);
                 break;
             }
-            case "User.updated":{
+            case "user.updated":{
                 await User.findByIdAndUpdate(data.id, userData);
                 break;
             }
-            case "User.deleted":{
+            case "user.deleted":{
                 await User.findByIdAndDelete(data.id);
                 break;
             }

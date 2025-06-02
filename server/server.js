@@ -5,8 +5,7 @@ import connectDB from "./configs/db.js";
 import { clerkMiddleware } from '@clerk/express'
 import clerkWebhooks from "./controller/clerkWebhooks.js";
 
-connectDB();
-
+ await connectDB();
 const app = express()
 app.use(cors()) 
 
