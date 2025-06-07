@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
+import Hotel from "../models/Hotel.js";
 
 // Function to check if a room is available for the given dates
 // Function to check room availability

@@ -1,7 +1,8 @@
 import Hotel from "../models/Hotel.js";
-import {v2 as cloudinary} from "cloudinary"
 import Room from "../models/Room.js";
 import { populate } from "dotenv";
+//import  connectCloudinary  from "../configs/cloudinary.js";
+import { cloudinary } from "../configs/cloudinary.js";
 
 //API to create a new room
 export const createRoom = async (req, res) => {
@@ -16,7 +17,7 @@ export const createRoom = async (req, res) => {
 
         //upload images to cloudinary
         const uploadImages = req.files.map(async (file) => {  //map() is used to transform each file into an uploaded image URL.
-            const response = await connectCloudinary.uploader.upload(file.path);
+            const response = await cloudinary.uploader.upload(file.path);
             return response.secure_url;
         })
         //wait for all uploads to complete
