@@ -2,6 +2,7 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import transporter from "../configs/nodemailer.js";
+import stripe from "stripe";
 
 // Function to check if a room is available for the given dates
 // Function to check room availability
@@ -84,8 +85,7 @@ export const createBooking = async (req, res) => {
                 <li><strong>Booking Amount:</strong> ${process.env.CURRENCY || '$'} ${booking.totalPrice} /night</li>
             </ul>
             <p>We look forward to welcoming you!</p>
-            <p>If you need to make any changes, feel free to contact us.</p>
-            `
+            <p>If you need to make any changes, feel free to contact us.</p>            `
 
         }
 
@@ -140,4 +140,47 @@ export const getHotelBookings = async (req, res) => {
             res.json({success: false, message: "Failed to fetch bookings"});
     }
 };
+
+
+export const stripePayment = async (req, res) => {
+  try {
+    const { bookingId } = req.body;
+
+    const booking = await Booking.findById(bookingId);
+    const roomData = await Room.findById(booking.room).populate("hotel");
+    const totalPrice = booking.totalPrice;
+    const { origin } = req.headers;
+
+    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+
+    const line_items = [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: roomData.hotel.name,
+          },
+          unit_amount: totalPrice * 100,
+        },
+        quantity: 1,
+      },
+    ];
+
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
+      mode: "payment",
+      success_url: `${origin}/loader/my-bookings`,
+      cancel_url: `${origin}/my-bookings`,
+      metadata:{
+        bookingId,
+      }
+    });
+
+    res.json({ success: true, url: session.url });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
 
