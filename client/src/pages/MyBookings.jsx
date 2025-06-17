@@ -27,9 +27,11 @@ import toast from 'react-hot-toast'
 
     const handlePayment = async (bookingId) => {
         try {
-            const { data } = await axios.post("/api/bookings/stripe-payment", { bookingId },
-            {headers: {Authorization: `Bearer ${await getToken()}`}}
+            const { data } = await axios.post("/api/bookings/stripe-payment", 
+                { bookingId },
+                {headers: {Authorization: `Bearer ${await getToken()}`}}
             );
+            console.log("Data-----------", data)
             if (data.success) {
             window.location.href = data.url;
             } else {

@@ -2,7 +2,7 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import transporter from "../configs/nodemailer.js";
-import stripe from "stripe";
+import Stripe from "stripe";
 
 // Function to check if a room is available for the given dates
 // Function to check room availability
@@ -151,7 +151,7 @@ export const stripePayment = async (req, res) => {
     const totalPrice = booking.totalPrice;
     const { origin } = req.headers;
 
-    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+    const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const line_items = [
       {
@@ -176,6 +176,8 @@ export const stripePayment = async (req, res) => {
         bookingId,
       }
     });
+
+    console.log("session------------", session);
 
     res.json({ success: true, url: session.url });
   } catch (error) {
