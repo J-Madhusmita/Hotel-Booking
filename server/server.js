@@ -20,12 +20,17 @@ app.use(cors())
 //api to listen to stripe webhooks
 app.post('/api/stripe', express.raw({type: "application/json"}), stripeWebhooks)
 
+app.post('/api/clerk',
+  express.raw({ type: 'application/json' }),
+  clerkWebhooks
+);
+
 // middleware
 app.use(express.json())
 app.use(clerkMiddleware())
 
-//API to listen clerkWebhooks
-app.post("/api/clerk", clerkWebhooks)
+// //API to listen clerkWebhooks
+// app.post("/api/clerk", clerkWebhooks)
 
 app.get('/', (req, res) => res.send("API is working fine"))
 app.use('/api/user', userRouter)
