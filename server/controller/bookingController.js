@@ -144,8 +144,29 @@ export const getHotelBookings = async (req, res) => {
 
 export const stripePayment = async (req, res) => {
   console.log("✅ stripePayment API called");
-  console.log("✅ process.env:", process.env);
-  console.log("✅ STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
+  console.log("✅ Environment check:");
+  console.log("- NODE_ENV:", process.env.NODE_ENV);
+  console.log("- STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
+  console.log("- STRIPE_SECRET_KEY length:", process.env.STRIPE_SECRET_KEY?.length);
+  console.log("- STRIPE_SECRET_KEY starts with:", process.env.STRIPE_SECRET_KEY?.substring(0, 10));
+
+  // Validate Stripe secret key
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error("❌ STRIPE_SECRET_KEY is not defined in environment variables");
+    return res.json({
+      success: false,
+      message: "Stripe configuration error: Secret key not found"
+    });
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
+    console.error("❌ STRIPE_SECRET_KEY appears to be invalid (should start with 'sk_')");
+    return res.json({
+      success: false,
+      message: "Stripe configuration error: Invalid secret key format"
+    });
+  }
+
   try {
     const { bookingId } = req.body;
 
@@ -154,6 +175,7 @@ export const stripePayment = async (req, res) => {
     const totalPrice = booking.totalPrice;
     const { origin } = req.headers;
 
+    console.log("✅ Initializing Stripe with secret key...");
     const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const line_items = [

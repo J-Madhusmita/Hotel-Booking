@@ -2,8 +2,23 @@ import Stripe from 'stripe';
 import Booking from '../models/Booking.js';
 
 export const stripeWebhooks = async (request, response) => {
+  // Validate Stripe configuration
+  console.log("🌿 Stripe Webhook Environment Check:");
+  console.log("- STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
+  console.log("- STRIPE_WEBHOOK_SECRET exists:", !!process.env.STRIPE_WEBHOOK_SECRET);
+  console.log("- STRIPE_SECRET_KEY starts with:", process.env.STRIPE_SECRET_KEY?.substring(0, 10));
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error("❌ STRIPE_SECRET_KEY is not defined in webhook environment");
+    return response.status(500).send("Stripe configuration error: Secret key not found");
+  }
+
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error("❌ STRIPE_WEBHOOK_SECRET is not defined in webhook environment");
+    return response.status(500).send("Stripe configuration error: Webhook secret not found");
+  }
+
   // Stripe Gateway Initialize
-  console.log("🌿 Stripe Secret Key (Webhook):", process.env.STRIPE_SECRET_KEY);
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = request.headers['stripe-signature'];
   let event;
