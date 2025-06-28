@@ -146,21 +146,38 @@ export const stripePayment = async (req, res) => {
   console.log("✅ stripePayment API called");
   console.log("✅ Environment check:");
   console.log("- NODE_ENV:", process.env.NODE_ENV);
+  console.log("- All env keys containing STRIPE:", Object.keys(process.env).filter(k => k.includes('STRIPE')));
   console.log("- STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
   console.log("- STRIPE_SECRET_KEY length:", process.env.STRIPE_SECRET_KEY?.length);
   console.log("- STRIPE_SECRET_KEY starts with:", process.env.STRIPE_SECRET_KEY?.substring(0, 10));
+  console.log("- Raw STRIPE_SECRET_KEY (first 20 chars):", JSON.stringify(process.env.STRIPE_SECRET_KEY?.substring(0, 20)));
+
+  // Try to reload environment variables (Render workaround)
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.log("🔄 Attempting to reload environment variables...");
+    try {
+      // Force reload dotenv in case Render has loading issues
+      const dotenv = await import('dotenv');
+      dotenv.config();
+      console.log("- After reload - STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
+    } catch (error) {
+      console.log("- Dotenv reload failed:", error.message);
+    }
+  }
 
   // Validate Stripe secret key
   if (!process.env.STRIPE_SECRET_KEY) {
     console.error("❌ STRIPE_SECRET_KEY is not defined in environment variables");
+    console.error("❌ Available env vars:", Object.keys(process.env).slice(0, 10));
     return res.json({
       success: false,
-      message: "Stripe configuration error: Secret key not found"
+      message: "Stripe configuration error: Secret key not found. Please check Render environment variables."
     });
   }
 
   if (!process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
     console.error("❌ STRIPE_SECRET_KEY appears to be invalid (should start with 'sk_')");
+    console.error("❌ Current value starts with:", process.env.STRIPE_SECRET_KEY.substring(0, 5));
     return res.json({
       success: false,
       message: "Stripe configuration error: Invalid secret key format"
