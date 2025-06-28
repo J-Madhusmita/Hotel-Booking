@@ -143,6 +143,9 @@ export const getHotelBookings = async (req, res) => {
 
 
 export const stripePayment = async (req, res) => {
+  console.log("✅ stripePayment API called");
+  console.log("✅ process.env:", process.env);
+  console.log("✅ STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
   try {
     const { bookingId } = req.body;
 

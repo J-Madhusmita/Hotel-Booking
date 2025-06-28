@@ -3,6 +3,7 @@ import Booking from '../models/Booking.js';
 
 export const stripeWebhooks = async (request, response) => {
   // Stripe Gateway Initialize
+  console.log("🌿 Stripe Secret Key (Webhook):", process.env.STRIPE_SECRET_KEY);
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = request.headers['stripe-signature'];
   let event;
